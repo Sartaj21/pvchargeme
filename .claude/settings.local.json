@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pvcharge.me)",
+      "WebFetch(domain:web.archive.org)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-import-alias --use-npm)",
+      "Read(//c/Users/sarta/Downloads/**)",
+      "Bash(npx create-next-app@latest pvchargeme-temp --typescript --tailwind --eslint --app --src-dir --no-import-alias --use-npm)",
+      "Bash(npx create-next-app@latest pvchargeme-temp --typescript --tailwind --eslint --app --src-dir --no-import-alias --use-npm --turbopack)",
+      "Bash(cp -r \"C:/Users/sarta/Downloads/pvchargeme-temp/\"* \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/\".* \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(rm -rf \"C:/Users/sarta/Downloads/pvchargeme-temp\")",
+      "Bash(cp -r \"C:/Users/sarta/Downloads/pvchargeme-temp/src\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp -r \"C:/Users/sarta/Downloads/pvchargeme-temp/public\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/package.json\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/package-lock.json\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/tsconfig.json\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/postcss.config.mjs\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/.gitignore\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
