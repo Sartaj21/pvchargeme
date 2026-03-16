@@ -19,7 +19,14 @@
       "Bash(cp \"C:/Users/sarta/Downloads/pvchargeme-temp/.gitignore\" \"C:/Users/sarta/Downloads/pvchargeme/\")",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(gh repo:*)",
+      "Bash(where gh:*)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\(x86\\)/**)",
+      "Bash(cmd.exe /c \"where gh\")",
+      "Bash(cmd.exe /c \"winget install GitHub.cli --accept-source-agreements --accept-package-agreements\")",
+      "Bash(powershell.exe -Command \"winget install GitHub.cli --accept-source-agreements --accept-package-agreements\")"
     ]
   }
 }

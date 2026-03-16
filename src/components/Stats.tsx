@@ -9,9 +9,9 @@ const stats = [
   },
   {
     icon: Sun,
-    value: "8hrs",
+    value: "6.5hrs",
     label: "Avg. Solar Generation",
-    detail: "Peak daily energy capture",
+    detail: "Annual average daily sun hours in AZ",
   },
   {
     icon: BatteryCharging,
