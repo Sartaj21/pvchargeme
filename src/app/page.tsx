@@ -84,44 +84,51 @@ const TABS = ["EV Charging", "Battery Storage", "Solar Canopy"] as const;
 type Tab = (typeof TABS)[number];
 
 const EV_CHARGING_SPECS = [
-  ["Max Single-Port Power", "Up to 800 kW"],
+  ["Max Single-Port Power", "Up to 500 kW"],
   ["Voltage Range", "0–1,000 VDC"],
-  ["Connectors", "NACS, CCS1, CHAdeMO"],
-  ["Protocol", "OCPP 2.0.1"],
-  ["Simultaneous Outputs", "Up to 4 per unit"],
+  ["Continuous Current", "Up to 615 A"],
+  ["Connectors", "NACS (J3400), CCS1, CHAdeMO"],
+  ["Protocol", "OCPP 2.0.1, ISO 15118-2"],
+  ["Simultaneous Outputs", "Up to 4 per cabinet"],
+  ["Cabinet Bus Power", "Up to 575 kW per cabinet"],
   ["Efficiency", "Up to 97.5%"],
-  ["Power Factor", "> 0.99"],
+  ["Power Factor", "> 0.99, THDi < 5%"],
   ["AC Input", "480V ±10%, 3-phase"],
-  ["Dynamic Load Mgmt", "Per-port allocation"],
-  ["Fleet-Ready", "Reservation system + dedicated bays"],
-  ["Payment", "Contactless / NFC"],
-  ["Rating", "IP54, ADA compliant"],
+  ["Dynamic Load Mgmt", "25–50 kW granularity per port"],
+  ["Payment", "Contactless, NFC, Apple Pay, Google Pay, RFID"],
+  ["Rating", "IP54 / NEMA 3R, ADA compliant"],
+  ["Flood Tolerance", "1,015 mm"],
+  ["Operating Temp", "-30°C to 50°C"],
 ];
 
 const BESS_SPECS = [
   ["Total Power", "4.5 MW"],
   ["Total Capacity", "12.5 MWh"],
+  ["Configuration", "3× 1,500 kW units (4,170 kWh each)"],
   ["Chemistry", "LFP (lithium iron phosphate)"],
   ["Inverter", "1,500 kW per unit, 3-phase"],
   ["Output", "AC ±10% — 690 VRMS"],
-  ["Cooling", "Closed-loop liquid"],
+  ["Cooling", "Closed-loop liquid cooled"],
   ["Controller", "Integrated microgrid site controller"],
-  ["Fire Suppression", "Integrated per container"],
-  ["Enclosures", "NEMA 3R outdoor rated"],
+  ["Fire Suppression", "Integrated per unit"],
+  ["Structure", "Corrosion-resistant aluminum, NEMA 3R outdoor"],
   ["Certifications", "UL 9540, UL 1973, UL 9540A, UL 1741 SB"],
   ["Salt Spray", "1,000-hour rated"],
   ["Warranty", "2-yr material + 5-yr parts (extendable)"],
+  ["Lead Time", "~34 weeks"],
 ];
 
 const SOLAR_SPECS = [
   ["DC Nameplate", "2.36 MW"],
-  ["Module Count", "6,288 bifacial HJT panels (375W each)"],
   ["AC Nameplate", "1.90 MW"],
   ["DC:AC Ratio", "1.24"],
+  ["Module Count", "6,288 bifacial heterojunction panels (375W each)"],
   ["Annual Production", "4,472 MWh"],
+  ["Energy to Grid", "4,471,685 kWh"],
   ["Specific Yield", "1,896 kWh/kWp"],
+  ["Performance Ratio", "85.0%"],
   ["GHI / POA", "2,071 / 2,232 kWh/m²"],
-  ["Performance Ratio", "~85%"],
+  ["Solar Access", "99.2% weighted"],
   ["Racking", "Carport canopy, 10° tilt, 180° azimuth"],
   ["Key Losses", "Soiling 2.0%, mismatch 4.1%, clipping 1.6%"],
 ];
@@ -301,8 +308,8 @@ export default function Home() {
               <motion.p variants={fadeUp} custom={2} className="text-muted mb-12 max-w-2xl leading-relaxed">
                 Strategically located at the I-40 / US-93 intersection
                 connecting Las Vegas, Flagstaff, and Albuquerque — adjacent to
-                the future I-11 corridor. The nearest DC fast-charging is 90+
-                miles in either direction on I-40.
+                the future I-11 corridor. Over 14,000 vehicles daily with 44%
+                heavy truck traffic (ADOT 2023).
               </motion.p>
             </motion.div>
 
@@ -335,12 +342,12 @@ export default function Home() {
                 variants={stagger}
               >
                 {[
-                  ["Coordinates", "34.86166°N, 114.144°W"],
+                  ["Coordinates", "34.86166°N, 114.1443°W"],
                   ["Location", "I-40 Exit 25, Mohave County"],
                   ["Corridor", "I-40 / US-93 (LV–Flagstaff–ABQ)"],
                   ["Future Corridor", "Adjacent to planned I-11"],
-                  ["AADT", "12,700+ vehicles"],
-                  ["Nearest DCFC", "90+ mi in either direction on I-40"],
+                  ["AADT", "14,360 vehicles (ADOT 2023)"],
+                  ["Truck Traffic", "44% of AADT (~6,300 trucks/day)"],
                   ["NEVI Eligible", "ADOT EVII Phase 2 (IIJA/BIL)"],
                 ].map(([label, value]) => (
                   <motion.div
@@ -373,7 +380,7 @@ export default function Home() {
                 System Overview
               </motion.h2>
               <motion.p variants={fadeUp} custom={2} className="text-muted mb-10 max-w-2xl">
-                Key specifications across all major subsystems. Vendor selection is ongoing — specs reflect target performance requirements.
+                Key specifications across all major subsystems.
               </motion.p>
             </motion.div>
 
@@ -428,7 +435,7 @@ export default function Home() {
                       </div>
                       <div>
                         <h3 className="font-semibold">DC Fast Charging</h3>
-                        <p className="text-xs text-muted">Multi-vendor, multi-standard</p>
+                        <p className="text-xs text-muted">Multi-standard DC fast charging</p>
                       </div>
                     </div>
                     <SpecTable rows={EV_CHARGING_SPECS} />
