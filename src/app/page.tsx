@@ -5,7 +5,6 @@ import {
   Zap,
   Battery,
   Sun,
-  Cpu,
   Plug,
   ArrowRight,
   ChevronRight,
@@ -16,7 +15,7 @@ import {
 const CONTACT_EMAIL = "M2@chargingplaza.com";
 
 /* ─── INFRASTRUCTURE TABS ─── */
-const TABS = ["EV Charging", "Battery Storage", "Solar Canopy", "GridLink"] as const;
+const TABS = ["EV Charging", "Battery Storage", "Solar Canopy"] as const;
 type Tab = (typeof TABS)[number];
 
 const EV_CHARGING_SPECS = [
@@ -62,15 +61,6 @@ const SOLAR_SPECS = [
   ["Key Losses", "Soiling 2.0%, mismatch 4.1%, clipping 1.6%"],
 ];
 
-const GRIDLINK_SPECS = [
-  ["Max Charging Output", "194 kW (44 kW grid + 150 kW ESS)"],
-  ["Battery Modules", "22 kW bidirectional AC/DC × 2"],
-  ["PV Integration", "Up to 30 kW (DC/DC with MPPT)"],
-  ["V2G Ready", "Battery-to-grid, peak shaving, ancillary services"],
-  ["Off-Grid", "Capable during blackouts / brownouts"],
-  ["Footprint", "Compact parking lot deployment"],
-  ["EMS", "Local + remote with charge scheduling"],
-];
 
 function SpecTable({ rows }: { rows: string[][] }) {
   return (
@@ -117,7 +107,7 @@ export default function Home() {
               Contact
             </a>
             <a
-              href="https://chargingplaza.vercel.app"
+              href="https://chargingplaza.biz"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs hover:border-accent hover:text-accent transition-colors"
@@ -176,7 +166,7 @@ export default function Home() {
                 { value: "4.5 MW", label: "Battery Storage", icon: Battery },
                 { value: "2.36 MW", label: "Solar Canopy (DC)", icon: Sun },
                 { value: "12.5 MWh", label: "Total Energy Capacity", icon: Zap },
-                { value: "4.47 GWh", label: "Annual Solar Production", icon: Cpu },
+                { value: "4.47 GWh", label: "Annual Solar Production", icon: Sun },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -265,11 +255,10 @@ export default function Home() {
             {/* Tabs */}
             <div className="flex gap-1 mb-10 border-b border-border overflow-x-auto">
               {TABS.map((tab) => {
-                const icons = {
+                const icons: Record<string, typeof Plug> = {
                   "EV Charging": Plug,
                   "Battery Storage": Battery,
                   "Solar Canopy": Sun,
-                  "GridLink": Cpu,
                 };
                 const Icon = icons[tab];
                 return (
@@ -336,20 +325,6 @@ export default function Home() {
                 </div>
               )}
 
-              {activeTab === "GridLink" && (
-                <div className="rounded-2xl border border-border bg-surface p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <Cpu className="h-5 w-5 text-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">GridLink Integration</h3>
-                      <p className="text-xs text-muted">V2G-Ready Charging + Storage</p>
-                    </div>
-                  </div>
-                  <SpecTable rows={GRIDLINK_SPECS} />
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -398,7 +373,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-5 text-xs text-muted">
             <a
-              href="https://chargingplaza.vercel.app"
+              href="https://chargingplaza.biz"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
