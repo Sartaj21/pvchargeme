@@ -135,7 +135,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-muted leading-relaxed mb-10 max-w-xl">
-                Investor-grade technical overview of our flagship charging plaza
+                Technical overview of our flagship charging plaza
                 at I-40 Exit 25, Yucca, Arizona. DC fast charging,
                 battery storage, and solar generation.
               </p>
