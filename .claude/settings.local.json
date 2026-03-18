@@ -26,7 +26,11 @@
       "Read(//c/Program Files \\(x86\\)/**)",
       "Bash(cmd.exe /c \"where gh\")",
       "Bash(cmd.exe /c \"winget install GitHub.cli --accept-source-agreements --accept-package-agreements\")",
-      "Bash(powershell.exe -Command \"winget install GitHub.cli --accept-source-agreements --accept-package-agreements\")"
+      "Bash(powershell.exe -Command \"winget install GitHub.cli --accept-source-agreements --accept-package-agreements\")",
+      "Bash(export PATH=\"/c/Program Files/GitHub CLI:$PATH\")",
+      "Bash(gh auth:*)",
+      "mcp__68e9a507-c640-426d-83b5-58746571a24d__deploy_to_vercel",
+      "Bash(npx vercel:*)"
     ]
   }
 }

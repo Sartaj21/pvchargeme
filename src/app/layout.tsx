@@ -8,9 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "PV Charge Me | We Charge Your EV With The Sun",
+  title: "Charging Plaza — Investor Overview | M2PV Capital",
   description:
-    "Solar-powered EV charging solutions. Clean energy meets electric mobility. Charge your electric vehicle with sustainable solar power.",
+    "Investor-grade technical overview of Charging Plaza: solar-powered EV charging infrastructure at I-40 Exit 25, Yucca AZ. Battery storage, solar canopy, and multi-vendor DC fast charging.",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={`${inter.variable} antialiased`}>{children}</body>
     </html>
   );
