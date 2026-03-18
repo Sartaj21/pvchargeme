@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap,
   Battery,
@@ -13,6 +14,70 @@ import {
 } from "lucide-react";
 
 const CONTACT_EMAIL = "M2@chargingplaza.com";
+
+/* ─── ANIMATIONS ─── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const },
+  }),
+};
+
+const stagger = {
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const },
+  },
+};
+
+/* ─── ANIMATED COUNTER ─── */
+function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [displayed, setDisplayed] = useState("0");
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const numericPart = parseFloat(value.replace(/[^0-9.]/g, ""));
+          const decimals = value.includes(".") ? (value.split(".")[1]?.replace(/[^0-9]/g, "").length || 0) : 0;
+          const duration = 1200;
+          const start = performance.now();
+          const animate = (now: number) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = numericPart * eased;
+            setDisplayed(current.toFixed(decimals));
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [value, hasAnimated]);
+
+  return (
+    <div ref={ref} className="text-2xl md:text-3xl font-bold tracking-tight mb-1 tabular-nums">
+      {displayed}{suffix}
+    </div>
+  );
+}
 
 /* ─── INFRASTRUCTURE TABS ─── */
 const TABS = ["EV Charging", "Battery Storage", "Solar Canopy"] as const;
@@ -61,15 +126,20 @@ const SOLAR_SPECS = [
   ["Key Losses", "Soiling 2.0%, mismatch 4.1%, clipping 1.6%"],
 ];
 
-
 function SpecTable({ rows }: { rows: string[][] }) {
   return (
     <div>
-      {rows.map(([label, value]) => (
-        <div key={label} className="spec-row">
+      {rows.map(([label, value], i) => (
+        <motion.div
+          key={label}
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: i * 0.03, duration: 0.3 }}
+          className="spec-row"
+        >
           <span className="spec-label">{label}</span>
           <span className="spec-value">{value}</span>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
@@ -81,7 +151,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border">
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border"
+      >
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
@@ -110,100 +185,136 @@ export default function Home() {
               href="https://chargingplaza.biz"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs hover:border-accent hover:text-accent transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs hover:border-accent hover:text-accent transition-all duration-300"
             >
               Main Site <ExternalLink className="h-3 w-3" />
             </a>
           </nav>
         </div>
-      </header>
+      </motion.header>
 
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 pt-24 pb-20 md:pt-36 md:pb-28">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-8">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                M2PV Capital
-              </div>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={stagger}
+              className="max-w-3xl"
+            >
+              <motion.div variants={fadeUp} custom={0}>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-8">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                  M2PV Capital
+                </div>
+              </motion.div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.08] mb-6">
+              <motion.h1
+                variants={fadeUp}
+                custom={1}
+                className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.08] mb-6"
+              >
                 Solar-Powered EV
                 <br />
                 <span className="gradient-text">Charging Infrastructure</span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-lg text-muted leading-relaxed mb-10 max-w-xl">
+              <motion.p
+                variants={fadeUp}
+                custom={2}
+                className="text-lg text-muted leading-relaxed mb-10 max-w-xl"
+              >
                 Technical overview of our flagship charging plaza
                 at I-40 Exit 25, Yucca, Arizona. DC fast charging,
                 battery storage, and solar generation.
-              </p>
+              </motion.p>
 
-              <div className="flex flex-wrap gap-4">
+              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap gap-4">
                 <a
                   href="#infrastructure"
-                  className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-colors"
+                  className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-white font-medium text-sm hover:bg-accent/90 hover:shadow-lg hover:shadow-accent/25 transition-all duration-300"
                 >
                   View Specs
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </a>
                 <a
                   href={`mailto:${CONTACT_EMAIL}?subject=Investor%20Inquiry`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-sm hover:border-muted transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-sm hover:border-foreground/30 hover:shadow-sm transition-all duration-300"
                 >
                   <Mail className="h-4 w-4" />
                   Investor Inquiry
                 </a>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
 
-          {/* Hero stat cards */}
+          {/* Hero stat cards with animated counters */}
           <div className="max-w-6xl mx-auto px-6 pb-20">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            >
               {[
-                { value: "4.5 MW", label: "Battery Storage", icon: Battery },
-                { value: "2.36 MW", label: "Solar Canopy (DC)", icon: Sun },
-                { value: "12.5 MWh", label: "Total Energy Capacity", icon: Zap },
-                { value: "4.47 GWh", label: "Annual Solar Production", icon: Sun },
+                { value: "4.5", suffix: " MW", label: "Battery Storage", icon: Battery },
+                { value: "2.36", suffix: " MW", label: "Solar Canopy (DC)", icon: Sun },
+                { value: "12.5", suffix: " MWh", label: "Total Energy Capacity", icon: Zap },
+                { value: "4.47", suffix: " GWh", label: "Annual Solar Production", icon: Sun },
               ].map((stat) => (
-                <div
+                <motion.div
                   key={stat.label}
-                  className="p-5 rounded-2xl border border-border bg-surface"
+                  variants={fadeUp}
+                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  className="p-5 rounded-2xl border border-border bg-surface hover:shadow-md hover:border-accent/20 transition-all duration-300"
                 >
                   <stat.icon className="h-4 w-4 text-accent mb-3" />
-                  <div className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
-                    {stat.value}
-                  </div>
+                  <AnimatedNumber value={stat.value} suffix={stat.suffix} />
                   <div className="text-xs text-muted">{stat.label}</div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
+          {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-accent/5 via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-20 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-emerald-500/3 via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
         </section>
 
         {/* Site Overview with Google Map */}
         <section id="site" className="py-20 md:py-28 border-t border-border bg-surface">
           <div className="max-w-6xl mx-auto px-6">
-            <p className="text-xs font-medium text-accent uppercase tracking-widest mb-3">
-              Site Overview
-            </p>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              Yucca, Arizona
-            </h2>
-            <p className="text-muted mb-12 max-w-2xl leading-relaxed">
-              Strategically located at the I-40 / US-93 intersection
-              connecting Las Vegas, Flagstaff, and Albuquerque — adjacent to
-              the future I-11 corridor. The nearest DC fast-charging is 90+
-              miles in either direction on I-40.
-            </p>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+            >
+              <motion.p variants={fadeUp} className="text-xs font-medium text-accent uppercase tracking-widest mb-3">
+                Site Overview
+              </motion.p>
+              <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                Yucca, Arizona
+              </motion.h2>
+              <motion.p variants={fadeUp} custom={2} className="text-muted mb-12 max-w-2xl leading-relaxed">
+                Strategically located at the I-40 / US-93 intersection
+                connecting Las Vegas, Flagstaff, and Albuquerque — adjacent to
+                the future I-11 corridor. The nearest DC fast-charging is 90+
+                miles in either direction on I-40.
+              </motion.p>
+            </motion.div>
 
             <div className="grid md:grid-cols-2 gap-10">
               {/* Map embed */}
-              <div className="rounded-2xl overflow-hidden border border-border aspect-[4/3]">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={scaleIn}
+                className="rounded-2xl overflow-hidden border border-border aspect-[4/3] shadow-sm"
+              >
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d52000!2d-114.144!3d34.86166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDUxJzQyLjAiTiAxMTTCsDA4JzM4LjQiVw!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
                   width="100%"
@@ -214,43 +325,57 @@ export default function Home() {
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Charging Plaza location — Yucca, AZ"
                 />
-              </div>
+              </motion.div>
 
-              {/* Site specs */}
-              <div>
-                <div className="space-y-0">
-                  {[
-                    ["Coordinates", "34.86166°N, 114.144°W"],
-                    ["Location", "I-40 Exit 25, Mohave County"],
-                    ["Corridor", "I-40 / US-93 (LV–Flagstaff–ABQ)"],
-                    ["Future Corridor", "Adjacent to planned I-11"],
-                    ["AADT", "12,700+ vehicles"],
-                    ["Nearest DCFC", "90+ mi in either direction on I-40"],
-                    ["NEVI Eligible", "ADOT EVII Phase 2 (IIJA/BIL)"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="spec-row">
-                      <span className="spec-label">{label}</span>
-                      <span className="spec-value">{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Site specs with staggered rows */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={stagger}
+              >
+                {[
+                  ["Coordinates", "34.86166°N, 114.144°W"],
+                  ["Location", "I-40 Exit 25, Mohave County"],
+                  ["Corridor", "I-40 / US-93 (LV–Flagstaff–ABQ)"],
+                  ["Future Corridor", "Adjacent to planned I-11"],
+                  ["AADT", "12,700+ vehicles"],
+                  ["Nearest DCFC", "90+ mi in either direction on I-40"],
+                  ["NEVI Eligible", "ADOT EVII Phase 2 (IIJA/BIL)"],
+                ].map(([label, value]) => (
+                  <motion.div
+                    key={label}
+                    variants={fadeUp}
+                    className="spec-row group hover:bg-accent/3 hover:px-3 -mx-0 rounded-lg transition-all duration-200"
+                  >
+                    <span className="spec-label">{label}</span>
+                    <span className="spec-value">{value}</span>
+                  </motion.div>
+                ))}
+              </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Technical Infrastructure — no vendor names, just overall specs */}
+        {/* Technical Infrastructure */}
         <section id="infrastructure" className="py-20 md:py-28 border-t border-border">
           <div className="max-w-6xl mx-auto px-6">
-            <p className="text-xs font-medium text-accent uppercase tracking-widest mb-3">
-              Technical Infrastructure
-            </p>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              System Overview
-            </h2>
-            <p className="text-muted mb-10 max-w-2xl">
-              Key specifications across all major subsystems. Vendor selection is ongoing — specs reflect target performance requirements.
-            </p>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+            >
+              <motion.p variants={fadeUp} className="text-xs font-medium text-accent uppercase tracking-widest mb-3">
+                Technical Infrastructure
+              </motion.p>
+              <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+                System Overview
+              </motion.h2>
+              <motion.p variants={fadeUp} custom={2} className="text-muted mb-10 max-w-2xl">
+                Key specifications across all major subsystems. Vendor selection is ongoing — specs reflect target performance requirements.
+              </motion.p>
+            </motion.div>
 
             {/* Tabs */}
             <div className="flex gap-1 mb-10 border-b border-border overflow-x-auto">
@@ -265,98 +390,136 @@ export default function Home() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`inline-flex items-center gap-2 pb-3 px-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                    className={`relative inline-flex items-center gap-2 pb-3 px-4 text-sm font-medium transition-colors whitespace-nowrap ${
                       activeTab === tab
-                        ? "text-accent border-b-2 border-accent"
-                        : "text-muted border-b-2 border-transparent hover:text-foreground"
+                        ? "text-accent"
+                        : "text-muted hover:text-foreground"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
                     {tab}
+                    {activeTab === tab && (
+                      <motion.div
+                        layoutId="tab-indicator"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      />
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            {/* Tab content */}
+            {/* Tab content with AnimatePresence */}
             <div className="max-w-2xl">
-              {activeTab === "EV Charging" && (
-                <div className="rounded-2xl border border-border bg-surface p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <Plug className="h-5 w-5 text-accent" />
+              <AnimatePresence mode="wait">
+                {activeTab === "EV Charging" && (
+                  <motion.div
+                    key="ev"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.25 }}
+                    className="rounded-2xl border border-border bg-surface p-6 hover:shadow-md transition-shadow duration-300"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <Plug className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">DC Fast Charging</h3>
+                        <p className="text-xs text-muted">Multi-vendor, multi-standard</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">DC Fast Charging</h3>
-                      <p className="text-xs text-muted">Multi-vendor, multi-standard</p>
-                    </div>
-                  </div>
-                  <SpecTable rows={EV_CHARGING_SPECS} />
-                </div>
-              )}
+                    <SpecTable rows={EV_CHARGING_SPECS} />
+                  </motion.div>
+                )}
 
-              {activeTab === "Battery Storage" && (
-                <div className="rounded-2xl border border-border bg-surface p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <Battery className="h-5 w-5 text-accent" />
+                {activeTab === "Battery Storage" && (
+                  <motion.div
+                    key="bess"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.25 }}
+                    className="rounded-2xl border border-border bg-surface p-6 hover:shadow-md transition-shadow duration-300"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <Battery className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Battery Energy Storage</h3>
+                        <p className="text-xs text-muted">4.5 MW / 12.5 MWh LFP</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">Battery Energy Storage</h3>
-                      <p className="text-xs text-muted">4.5 MW / 12.5 MWh LFP</p>
-                    </div>
-                  </div>
-                  <SpecTable rows={BESS_SPECS} />
-                </div>
-              )}
+                    <SpecTable rows={BESS_SPECS} />
+                  </motion.div>
+                )}
 
-              {activeTab === "Solar Canopy" && (
-                <div className="rounded-2xl border border-border bg-surface p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <Sun className="h-5 w-5 text-accent" />
+                {activeTab === "Solar Canopy" && (
+                  <motion.div
+                    key="solar"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.25 }}
+                    className="rounded-2xl border border-border bg-surface p-6 hover:shadow-md transition-shadow duration-300"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <Sun className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Solar Canopy Array</h3>
+                        <p className="text-xs text-muted">2.36 MW DC — Bifacial HJT</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">Solar Canopy Array</h3>
-                      <p className="text-xs text-muted">2.36 MW DC — Bifacial HJT</p>
-                    </div>
-                  </div>
-                  <SpecTable rows={SOLAR_SPECS} />
-                </div>
-              )}
-
+                    <SpecTable rows={SOLAR_SPECS} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </section>
 
         {/* Contact */}
-        <section id="contact" className="py-20 md:py-28 border-t border-border bg-surface">
-          <div className="max-w-6xl mx-auto px-6">
-            <div className="max-w-xl mx-auto text-center">
-              <p className="text-xs font-medium text-accent uppercase tracking-widest mb-3">
+        <section id="contact" className="py-20 md:py-28 border-t border-border bg-surface relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-transparent to-emerald-500/3 pointer-events-none" />
+          <div className="max-w-6xl mx-auto px-6 relative">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="max-w-xl mx-auto text-center"
+            >
+              <motion.p variants={fadeUp} className="text-xs font-medium text-accent uppercase tracking-widest mb-3">
                 Contact
-              </p>
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+              </motion.p>
+              <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 Investor Inquiries
-              </h2>
-              <p className="text-muted mb-10 leading-relaxed">
+              </motion.h2>
+              <motion.p variants={fadeUp} custom={2} className="text-muted mb-10 leading-relaxed">
                 For project documentation or partnership
                 opportunities, reach out to the M2PV Capital team directly.
-              </p>
+              </motion.p>
 
-              <a
-                href={`mailto:${CONTACT_EMAIL}?subject=Investor%20Inquiry%20—%20Charging%20Plaza`}
-                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-all"
-              >
-                <Mail className="h-4 w-4" />
-                {CONTACT_EMAIL}
-                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
+              <motion.div variants={fadeUp} custom={3}>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=Investor%20Inquiry%20—%20Charging%20Plaza`}
+                  className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-medium text-sm hover:bg-accent/90 hover:shadow-lg hover:shadow-accent/25 transition-all duration-300"
+                >
+                  <Mail className="h-4 w-4" />
+                  {CONTACT_EMAIL}
+                  <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </a>
+              </motion.div>
 
-              <p className="text-xs text-muted mt-6">
+              <motion.p variants={fadeUp} custom={4} className="text-xs text-muted mt-6">
                 No dollar figures disclosed publicly — capacity and scale only.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           </div>
         </section>
       </main>
