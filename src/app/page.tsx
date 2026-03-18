@@ -308,8 +308,8 @@ export default function Home() {
               <motion.p variants={fadeUp} custom={2} className="text-muted mb-12 max-w-2xl leading-relaxed">
                 Strategically located at the I-40 / US-93 intersection
                 connecting Las Vegas, Flagstaff, and Albuquerque — adjacent to
-                the future I-11 corridor. Over 14,000 vehicles daily with 44%
-                heavy truck traffic (ADOT 2023).
+                the future I-11 corridor. Over 15,000 vehicles daily with 43%
+                heavy truck traffic (ADOT 2024).
               </motion.p>
             </motion.div>
 
@@ -346,8 +346,8 @@ export default function Home() {
                   ["Location", "I-40 Exit 25, Mohave County"],
                   ["Corridor", "I-40 / US-93 (LV–Flagstaff–ABQ)"],
                   ["Future Corridor", "Adjacent to planned I-11"],
-                  ["AADT", "14,360 vehicles (ADOT 2023)"],
-                  ["Truck Traffic", "44% of AADT (~6,300 trucks/day)"],
+                  ["AADT", "15,076 vehicles (ADOT 2024)"],
+                  ["Truck Traffic", "43% of AADT (~6,480 trucks/day)"],
                   ["NEVI Eligible", "ADOT EVII Phase 2 (IIJA/BIL)"],
                 ].map(([label, value]) => (
                   <motion.div
